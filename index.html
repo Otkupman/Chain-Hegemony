@@ -135,7 +135,29 @@
       text-align: center;
       min-width: 300px;
     }
-    /* How to play section */
+    .extra-controls {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: #ccc;
+      font-size: 14px;
+      margin: 8px 0;
+    }
+    .extra-controls label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .extra-controls input[type="range"] {
+      width: 100px;
+      accent-color: #e94560;
+    }
+    .extra-controls input[type="checkbox"] {
+      accent-color: #e94560;
+      width: 16px;
+      height: 16px;
+    }
     .how-to-play {
       background: rgba(0,0,0,0.3);
       border-radius: 12px;
@@ -200,7 +222,7 @@
       color: white;
     }
     .mini-cell.center {
-      background: #c0392b;
+      background: #555;
       position: relative;
     }
     .mini-cell.center::after {
@@ -210,7 +232,7 @@
       font-size: 16px;
     }
     .mini-cell.neighbor {
-      background: #e94560;   /* changed from green to pink */
+      background: #e94560;
     }
     .explanation {
       margin-top: 8px;
@@ -218,7 +240,6 @@
       line-height: 1.5;
       text-align: center;
     }
-    /* Copyright */
     .copyright {
       margin-top: 12px;
       width: 100%;
@@ -256,11 +277,19 @@
       <button class="btn" id="newGameBtn">New Game</button>
     </div>
     <div id="playersSetup" class="players-setup"></div>
+    <div class="extra-controls">
+      <label>
+        Speed: <input type="range" id="speedSlider" min="1" max="10" value="10">
+        <span id="speedValue">10</span>
+      </label>
+      <label>
+        Sound: <input type="checkbox" id="soundCheckbox" checked>
+      </label>
+    </div>
   </div>
 
   <div id="status" class="status">Configure the game and press New Game</div>
 
-  <!-- How to play -->
   <div class="how-to-play">
     <h3>How to play?</h3>
     <div class="chain-demo">
@@ -294,23 +323,26 @@
     </div>
   </div>
 
-  <!-- Copyright -->
   <div class="copyright">© ODVk</div>
 </div>
 
 <script>
   (function() {
-    // ---------- Constants ----------
     const ROWS = 8, COLS = 8;
     const CELL_SIZE = 64;
-    const COLORS = ["#E74C3C", "#3498DB", "#2ECC71", "#F1C40F"]; // red, blue, green, yellow
+    const COLORS = ["#E74C3C", "#3498DB", "#2ECC71", "#F1C40F"];
     const EMPTY_COLOR = "#BDC3C7";
     const HIGHLIGHT_COLOR = "#2C3E50";
     const AI_PREVIEW_COLOR = "#F39C12";
     const TURN_BORDER_WIDTH = 5;
-    const ANIMATION_DELAY = 200;
 
-    // ---------- Color utility ----------
+    let speed = 10;
+    let soundEnabled = true;
+
+    function getExplosionDelay() { return Math.round(500 / speed); }
+    function getAiThinkDelay() { return Math.round(250 / speed); }
+    function getAiHighlightDelay() { return Math.round(400 / speed); }
+
     function darkenColor(hex, factor) {
       hex = hex.replace('#', '');
       const r = parseInt(hex.substring(0,2), 16);
@@ -332,8 +364,8 @@
       return darkenColor(base, factor);
     }
 
-    // ---------- Sound ----------
     function playBeep(freq, duration) {
+      if (!soundEnabled) return;
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const oscillator = audioCtx.createOscillator();
@@ -346,12 +378,12 @@
         gainNode.connect(audioCtx.destination);
         oscillator.start(audioCtx.currentTime);
         oscillator.stop(audioCtx.currentTime + duration / 1000);
-      } catch (e) { /* ignore */ }
+      } catch (e) { }
     }
+
     function soundMove() { playBeep(800, 80); }
     function soundExplosion() { playBeep(250, 150); }
 
-    // ---------- Board Logic ----------
     class Board {
       constructor(numPlayers) {
         this.numPlayers = numPlayers;
@@ -360,6 +392,7 @@
         );
         this.initCorners();
       }
+
       initCorners() {
         const corners = {
           2: { 0: [0,0], 1: [7,7] },
@@ -372,6 +405,7 @@
           this.grid[r][c].owner = p;
         }
       }
+
       clone() {
         const b = new Board(this.numPlayers);
         for (let r = 0; r < ROWS; r++) {
@@ -384,6 +418,7 @@
         }
         return b;
       }
+
       legalMoves(player) {
         const moves = [];
         for (let r = 0; r < ROWS; r++) {
@@ -393,6 +428,7 @@
         }
         return moves;
       }
+
       activePlayers() {
         const owners = new Set();
         for (let r = 0; r < ROWS; r++) {
@@ -403,12 +439,14 @@
         }
         return [...owners].sort((a,b) => a - b);
       }
+
       winner() {
         const active = this.activePlayers();
         if (active.length === 1) return active[0];
         if (active.length === 0) return -1;
         return null;
       }
+
       addPiece(player, r, c) {
         if (this.grid[r][c].owner !== player) return [];
         this.grid[r][c].count++;
@@ -445,7 +483,6 @@
       }
     }
 
-    // ---------- AI ----------
     function evaluate(board, player, activePlayers) {
       let myCount = 0;
       let otherCounts = [];
@@ -538,13 +575,15 @@
       return legal[0];
     }
 
-    // ---------- Interface ----------
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const statusDiv = document.getElementById('status');
     const numPlayersSelect = document.getElementById('numPlayers');
     const playersSetupDiv = document.getElementById('playersSetup');
     const newGameBtn = document.getElementById('newGameBtn');
+    const speedSlider = document.getElementById('speedSlider');
+    const speedValue = document.getElementById('speedValue');
+    const soundCheckbox = document.getElementById('soundCheckbox');
 
     let board = null;
     let players = [];
@@ -554,6 +593,14 @@
     let aiHighlight = null;
     let animationTimer = null;
 
+    speedSlider.addEventListener('input', () => {
+      speed = parseInt(speedSlider.value);
+      speedValue.textContent = speed;
+    });
+    soundCheckbox.addEventListener('change', () => {
+      soundEnabled = soundCheckbox.checked;
+    });
+
     function getDefaultPlayers(num) {
       const arr = [];
       for (let i = 0; i < num; i++) {
@@ -562,7 +609,6 @@
       return arr;
     }
 
-    // Toggle visibility of difficulty select based on radio selection
     function attachPlayerEvents() {
       const num = parseInt(numPlayersSelect.value);
       for (let i = 0; i < num; i++) {
@@ -571,15 +617,11 @@
         const diffSelect = document.getElementById(`diff${i}`);
         if (!humanRadio || !aiRadio || !diffSelect) continue;
         const updateVisibility = () => {
-          if (humanRadio.checked) {
-            diffSelect.style.display = 'none';
-          } else {
-            diffSelect.style.display = 'inline-block';
-          }
+          diffSelect.style.display = humanRadio.checked ? 'none' : 'inline-block';
         };
         humanRadio.addEventListener('change', updateVisibility);
         aiRadio.addEventListener('change', updateVisibility);
-        updateVisibility(); // set initial state
+        updateVisibility();
       }
     }
 
@@ -644,7 +686,6 @@
         }
       }
 
-      // Current player border
       if (!gameOver && currentPlayer !== null && board.activePlayers().includes(currentPlayer)) {
         ctx.strokeStyle = COLORS[currentPlayer];
         ctx.lineWidth = TURN_BORDER_WIDTH;
@@ -652,7 +693,6 @@
                        canvas.width - TURN_BORDER_WIDTH, canvas.height - TURN_BORDER_WIDTH);
       }
 
-      // Legal move highlights for human
       if (!gameOver && !animating && players[currentPlayer] && players[currentPlayer].type === 'human') {
         const legal = board.legalMoves(currentPlayer);
         for (const [r, c] of legal) {
@@ -665,7 +705,6 @@
         }
       }
 
-      // AI preview
       if (aiHighlight) {
         const [r, c] = aiHighlight;
         const x = c * CELL_SIZE, y = r * CELL_SIZE;
@@ -715,7 +754,7 @@
         setStatus(`Player ${currentPlayer+1}'s turn (Human) — select a cell`);
       } else {
         setStatus(`Player ${currentPlayer+1}'s turn (AI) — thinking…`);
-        setTimeout(() => aiTurn(), 300);
+        setTimeout(() => aiTurn(), getAiThinkDelay());
       }
     }
 
@@ -735,7 +774,7 @@
       setTimeout(() => {
         aiHighlight = null;
         executeMove(r, c);
-      }, 400);
+      }, getAiHighlightDelay());
     }
 
     function executeMove(r, c) {
@@ -753,7 +792,7 @@
         board = states[index];
         drawBoard();
         if (index > 0) soundExplosion();
-        animationTimer = setTimeout(() => animateChain(states, index + 1), ANIMATION_DELAY);
+        animationTimer = setTimeout(() => animateChain(states, index + 1), getExplosionDelay());
       } else {
         animating = false;
         drawBoard();
@@ -807,6 +846,9 @@
     canvas.addEventListener('click', handleCanvasClick);
 
     renderPlayersSetup();
+    speed = parseInt(speedSlider.value);
+    speedValue.textContent = speed;
+    soundEnabled = soundCheckbox.checked;
     window.addEventListener('load', () => {
       setTimeout(newGame, 100);
     });
