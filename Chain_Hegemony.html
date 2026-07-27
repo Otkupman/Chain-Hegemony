@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAABlSURBVFhHYzQyMvrPMICACURsleICYxgglc+UthKMYYAUPtgBAwkGRxQMJBhNA6NpYDQNjKaB0TQwmgbADvgzyx6MYYBU/v5Jd8EYBkjhj6aB0TQwmgZG08BoGhhNAyM9DTAwAABgVcwVAjRCngAAAABJRU5ErkJggg==">
+  <title>Chain Hegemony</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+    }
+    .game-container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    canvas {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      display: block;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .top-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .player-count {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #eee;
+      font-size: 14px;
+    }
+    .player-count select {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: none;
+      background: #2a2a4a;
+      color: white;
+      font-size: 14px;
+      outline: none;
+    }
+    .players-setup {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+    .player-card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #ddd;
+      font-size: 13px;
+    }
+    .player-card .name {
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+    .player-card .options {
+      display: flex;
+      gap: 6px;
+    }
+    .player-card label {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+    }
+    .player-card select {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: none;
+      background: #3a3a5a;
+      color: white;
+      font-size: 12px;
+      outline: none;
+      margin-left: 4px;
+    }
+    .btn {
+      background: #e94560;
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.1s;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+    }
+    .btn:hover {
+      background: #c23152;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+    .status {
+      font-size: 16px;
+      font-weight: 500;
+      color: #f0f0f0;
+      background: rgba(0,0,0,0.3);
+      padding: 8px 20px;
+      border-radius: 20px;
+      text-align: center;
+      min-width: 300px;
+    }
+    /* How to play section */
+    .how-to-play {
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: #ccc;
+      font-size: 14px;
+      max-width: 500px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .how-to-play h3 {
+      margin-bottom: 12px;
+      color: #fff;
+      text-align: center;
+    }
+    .chain-demo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .chain-cell {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #aaa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+      color: white;
+      background: #555;
+    }
+    .arrow {
+      font-size: 20px;
+      color: #e94560;
+      margin: 0 2px;
+    }
+    .explosion-demo {
+      display: flex;
+      justify-content: center;
+      margin: 8px 0;
+    }
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 36px);
+      grid-template-rows: repeat(3, 36px);
+      gap: 2px;
+      background: #222;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .mini-cell {
+      background: #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+    }
+    .mini-cell.center {
+      background: #c0392b;
+      position: relative;
+    }
+    .mini-cell.center::after {
+      content: "✕";
+      position: absolute;
+      color: rgba(255,255,255,0.7);
+      font-size: 16px;
+    }
+    .mini-cell.neighbor {
+      background: #e94560;   /* changed from green to pink */
+    }
+    .explanation {
+      margin-top: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+    }
+    /* Copyright */
+    .copyright {
+      margin-top: 12px;
+      width: 100%;
+      text-align: right;
+      color: rgba(255,255,255,0.4);
+      font-size: 12px;
+      padding-right: 8px;
+    }
+    @media (max-width: 700px) {
+      .top-controls {
+        flex-direction: column;
+        align-items: center;
+      }
+      canvas {
+        width: 100%;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="game-container">
+  <canvas id="gameCanvas" width="512" height="512"></canvas>
+
+  <div class="controls">
+    <div class="top-controls">
+      <div class="player-count">
+        <span>Players:</span>
+        <select id="numPlayers">
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4" selected>4</option>
+        </select>
+      </div>
+      <button class="btn" id="newGameBtn">New Game</button>
+    </div>
+    <div id="playersSetup" class="players-setup"></div>
+  </div>
+
+  <div id="status" class="status">Configure the game and press New Game</div>
+
+  <!-- How to play -->
+  <div class="how-to-play">
+    <h3>How to play?</h3>
+    <div class="chain-demo">
+      <div class="chain-cell">1</div>
+      <span class="arrow">→</span>
+      <div class="chain-cell">2</div>
+      <span class="arrow">→</span>
+      <div class="chain-cell">3</div>
+      <span class="arrow">→</span>
+      <div class="chain-cell" style="background:#e94560;">4</div>
+      <span class="arrow">→</span>
+      <span style="font-size:24px; color:#e94560;">💥</span>
+    </div>
+    <div class="explosion-demo">
+      <div class="mini-grid">
+        <div class="mini-cell"></div>
+        <div class="mini-cell neighbor">1</div>
+        <div class="mini-cell"></div>
+        <div class="mini-cell neighbor">1</div>
+        <div class="mini-cell center">0</div>
+        <div class="mini-cell neighbor">1</div>
+        <div class="mini-cell"></div>
+        <div class="mini-cell neighbor">1</div>
+        <div class="mini-cell"></div>
+      </div>
+    </div>
+    <div class="explanation">
+      <strong>Place one piece</strong> on any cell you own.<br>
+      When a cell reaches <strong>4 pieces</strong>, it <strong>explodes</strong>: all pieces scatter to orthogonal neighbours (one each) and the cell empties.<br>
+      Captured cells change to your colour. Chain reactions may occur!
+    </div>
+  </div>
+
+  <!-- Copyright -->
+  <div class="copyright">© ODVk</div>
+</div>
+
+<script>
+  (function() {
+    // ---------- Constants ----------
+    const ROWS = 8, COLS = 8;
+    const CELL_SIZE = 64;
+    const COLORS = ["#E74C3C", "#3498DB", "#2ECC71", "#F1C40F"]; // red, blue, green, yellow
+    const EMPTY_COLOR = "#BDC3C7";
+    const HIGHLIGHT_COLOR = "#2C3E50";
+    const AI_PREVIEW_COLOR = "#F39C12";
+    const TURN_BORDER_WIDTH = 5;
+    const ANIMATION_DELAY = 200;
+
+    // ---------- Color utility ----------
+    function darkenColor(hex, factor) {
+      hex = hex.replace('#', '');
+      const r = parseInt(hex.substring(0,2), 16);
+      const g = parseInt(hex.substring(2,4), 16);
+      const b = parseInt(hex.substring(4,6), 16);
+      const nr = Math.round(r * factor);
+      const ng = Math.round(g * factor);
+      const nb = Math.round(b * factor);
+      return `#${nr.toString(16).padStart(2,'0')}${ng.toString(16).padStart(2,'0')}${nb.toString(16).padStart(2,'0')}`;
+    }
+
+    function cellColor(owner, count) {
+      if (owner === null) return EMPTY_COLOR;
+      const base = COLORS[owner];
+      let factor = 1;
+      if (count === 2) factor = 0.8;
+      else if (count === 3) factor = 0.6;
+      else if (count >= 4) factor = 0.4;
+      return darkenColor(base, factor);
+    }
+
+    // ---------- Sound ----------
+    function playBeep(freq, duration) {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration / 1000);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.start(audioCtx.currentTime);
+        oscillator.stop(audioCtx.currentTime + duration / 1000);
+      } catch (e) { /* ignore */ }
+    }
+    function soundMove() { playBeep(800, 80); }
+    function soundExplosion() { playBeep(250, 150); }
+
+    // ---------- Board Logic ----------
+    class Board {
+      constructor(numPlayers) {
+        this.numPlayers = numPlayers;
+        this.grid = Array.from({ length: ROWS }, () =>
+          Array.from({ length: COLS }, () => ({ count: 0, owner: null }))
+        );
+        this.initCorners();
+      }
+      initCorners() {
+        const corners = {
+          2: { 0: [0,0], 1: [7,7] },
+          3: { 0: [0,0], 1: [0,7], 2: [7,0] },
+          4: { 0: [0,0], 1: [0,7], 2: [7,0], 3: [7,7] }
+        };
+        for (let p = 0; p < this.numPlayers; p++) {
+          const [r, c] = corners[this.numPlayers][p];
+          this.grid[r][c].count = 3;
+          this.grid[r][c].owner = p;
+        }
+      }
+      clone() {
+        const b = new Board(this.numPlayers);
+        for (let r = 0; r < ROWS; r++) {
+          for (let c = 0; c < COLS; c++) {
+            b.grid[r][c] = {
+              count: this.grid[r][c].count,
+              owner: this.grid[r][c].owner
+            };
+          }
+        }
+        return b;
+      }
+      legalMoves(player) {
+        const moves = [];
+        for (let r = 0; r < ROWS; r++) {
+          for (let c = 0; c < COLS; c++) {
+            if (this.grid[r][c].owner === player) moves.push([r, c]);
+          }
+        }
+        return moves;
+      }
+      activePlayers() {
+        const owners = new Set();
+        for (let r = 0; r < ROWS; r++) {
+          for (let c = 0; c < COLS; c++) {
+            const cell = this.grid[r][c];
+            if (cell.count > 0 && cell.owner !== null) owners.add(cell.owner);
+          }
+        }
+        return [...owners].sort((a,b) => a - b);
+      }
+      winner() {
+        const active = this.activePlayers();
+        if (active.length === 1) return active[0];
+        if (active.length === 0) return -1;
+        return null;
+      }
+      addPiece(player, r, c) {
+        if (this.grid[r][c].owner !== player) return [];
+        this.grid[r][c].count++;
+        this.grid[r][c].owner = player;
+        const states = [];
+        while (true) {
+          let toExplode = null;
+          for (let i = 0; i < ROWS; i++) {
+            for (let j = 0; j < COLS; j++) {
+              if (this.grid[i][j].count >= 4) {
+                toExplode = [i, j];
+                break;
+              }
+            }
+            if (toExplode) break;
+          }
+          if (!toExplode) break;
+          const [r0, c0] = toExplode;
+          const p = this.grid[r0][c0].owner;
+          this.grid[r0][c0].count = 0;
+          this.grid[r0][c0].owner = null;
+          const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+          for (const [dr, dc] of dirs) {
+            const nr = r0 + dr, nc = c0 + dc;
+            if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+              this.grid[nr][nc].count++;
+              this.grid[nr][nc].owner = p;
+            }
+          }
+          states.push(this.clone());
+        }
+        if (states.length === 0) states.push(this.clone());
+        return states;
+      }
+    }
+
+    // ---------- AI ----------
+    function evaluate(board, player, activePlayers) {
+      let myCount = 0;
+      let otherCounts = [];
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = board.grid[r][c];
+          if (cell.owner === player) myCount += cell.count;
+          else if (cell.owner !== null && activePlayers.includes(cell.owner)) {
+            const idx = otherCounts.findIndex(x => x.player === cell.owner);
+            if (idx === -1) otherCounts.push({ player: cell.owner, count: cell.count });
+            else otherCounts[idx].count += cell.count;
+          }
+        }
+      }
+      const maxOther = otherCounts.length > 0 ? Math.max(...otherCounts.map(o => o.count)) : 0;
+      return myCount - maxOther;
+    }
+
+    function aiMove(board, player, difficulty) {
+      const legal = board.legalMoves(player);
+      if (legal.length === 0) return null;
+      if (difficulty === 'easy') {
+        return legal[Math.floor(Math.random() * legal.length)];
+      }
+      const active = board.activePlayers();
+      if (difficulty === 'medium') {
+        let bestScore = -Infinity;
+        let bestMoves = [];
+        for (const move of legal) {
+          const sim = board.clone();
+          sim.addPiece(player, move[0], move[1]);
+          const w = sim.winner();
+          let score;
+          if (w === player) score = 10000;
+          else if (w !== null && w !== -1) score = -10000;
+          else if (w === -1) score = -5000;
+          else score = evaluate(sim, player, active);
+          if (score > bestScore) {
+            bestScore = score;
+            bestMoves = [move];
+          } else if (score === bestScore) {
+            bestMoves.push(move);
+          }
+        }
+        return bestMoves[Math.floor(Math.random() * bestMoves.length)];
+      }
+      if (difficulty === 'hard') {
+        const opponents = active.filter(p => p !== player);
+        let targetOpponent = null;
+        let maxOppCount = -1;
+        for (const opp of opponents) {
+          let cnt = 0;
+          for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+              if (board.grid[r][c].owner === opp) cnt += board.grid[r][c].count;
+            }
+          }
+          if (cnt > maxOppCount) {
+            maxOppCount = cnt;
+            targetOpponent = opp;
+          }
+        }
+        if (targetOpponent === null) return legal[0];
+        let bestScore = -Infinity;
+        let bestMoves = [];
+        for (const move of legal) {
+          const simAfterMyMove = board.clone();
+          simAfterMyMove.addPiece(player, move[0], move[1]);
+          const oppLegal = simAfterMyMove.legalMoves(targetOpponent);
+          let minScore = Infinity;
+          if (oppLegal.length === 0) {
+            minScore = evaluate(simAfterMyMove, player, active);
+          } else {
+            for (const oppMove of oppLegal) {
+              const simAfterOpp = simAfterMyMove.clone();
+              simAfterOpp.addPiece(targetOpponent, oppMove[0], oppMove[1]);
+              const score = evaluate(simAfterOpp, player, active);
+              if (score < minScore) minScore = score;
+            }
+          }
+          if (minScore > bestScore) {
+            bestScore = minScore;
+            bestMoves = [move];
+          } else if (minScore === bestScore) {
+            bestMoves.push(move);
+          }
+        }
+        return bestMoves[Math.floor(Math.random() * bestMoves.length)];
+      }
+      return legal[0];
+    }
+
+    // ---------- Interface ----------
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const statusDiv = document.getElementById('status');
+    const numPlayersSelect = document.getElementById('numPlayers');
+    const playersSetupDiv = document.getElementById('playersSetup');
+    const newGameBtn = document.getElementById('newGameBtn');
+
+    let board = null;
+    let players = [];
+    let currentPlayer = 0;
+    let gameOver = false;
+    let animating = false;
+    let aiHighlight = null;
+    let animationTimer = null;
+
+    function getDefaultPlayers(num) {
+      const arr = [];
+      for (let i = 0; i < num; i++) {
+        arr.push({ type: i === 0 ? 'human' : 'ai', difficulty: 'easy' });
+      }
+      return arr;
+    }
+
+    // Toggle visibility of difficulty select based on radio selection
+    function attachPlayerEvents() {
+      const num = parseInt(numPlayersSelect.value);
+      for (let i = 0; i < num; i++) {
+        const humanRadio = document.querySelector(`input[name="player${i}"][value="human"]`);
+        const aiRadio = document.querySelector(`input[name="player${i}"][value="ai"]`);
+        const diffSelect = document.getElementById(`diff${i}`);
+        if (!humanRadio || !aiRadio || !diffSelect) continue;
+        const updateVisibility = () => {
+          if (humanRadio.checked) {
+            diffSelect.style.display = 'none';
+          } else {
+            diffSelect.style.display = 'inline-block';
+          }
+        };
+        humanRadio.addEventListener('change', updateVisibility);
+        aiRadio.addEventListener('change', updateVisibility);
+        updateVisibility(); // set initial state
+      }
+    }
+
+    function renderPlayersSetup() {
+      const num = parseInt(numPlayersSelect.value);
+      playersSetupDiv.innerHTML = '';
+      for (let i = 0; i < num; i++) {
+        const card = document.createElement('div');
+        card.className = 'player-card';
+        card.innerHTML = `
+          <div class="name">Player ${i+1}</div>
+          <div class="options">
+            <label><input type="radio" name="player${i}" value="human" ${i === 0 ? 'checked' : ''}> Human</label>
+            <label><input type="radio" name="player${i}" value="ai" ${i > 0 ? 'checked' : ''}> AI</label>
+          </div>
+          <select id="diff${i}" class="diff-select">
+            <option value="easy" selected>Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        `;
+        playersSetupDiv.appendChild(card);
+      }
+      attachPlayerEvents();
+    }
+
+    function collectPlayers() {
+      const num = parseInt(numPlayersSelect.value);
+      const arr = [];
+      for (let i = 0; i < num; i++) {
+        const typeRadio = document.querySelector(`input[name="player${i}"]:checked`);
+        const diffSelect = document.getElementById(`diff${i}`);
+        const type = typeRadio ? typeRadio.value : 'ai';
+        const difficulty = (type === 'ai') ? diffSelect.value : 'easy';
+        arr.push({ type, difficulty });
+      }
+      return arr;
+    }
+
+    function drawBoard() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!board) return;
+
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const x = c * CELL_SIZE, y = r * CELL_SIZE;
+          const cell = board.grid[r][c];
+          const color = cellColor(cell.owner, cell.count);
+          ctx.fillStyle = color;
+          ctx.fillRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+          ctx.strokeStyle = '#000';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+
+          if (cell.count > 0) {
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 18px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(cell.count, x + CELL_SIZE/2, y + CELL_SIZE/2);
+          }
+        }
+      }
+
+      // Current player border
+      if (!gameOver && currentPlayer !== null && board.activePlayers().includes(currentPlayer)) {
+        ctx.strokeStyle = COLORS[currentPlayer];
+        ctx.lineWidth = TURN_BORDER_WIDTH;
+        ctx.strokeRect(TURN_BORDER_WIDTH/2, TURN_BORDER_WIDTH/2,
+                       canvas.width - TURN_BORDER_WIDTH, canvas.height - TURN_BORDER_WIDTH);
+      }
+
+      // Legal move highlights for human
+      if (!gameOver && !animating && players[currentPlayer] && players[currentPlayer].type === 'human') {
+        const legal = board.legalMoves(currentPlayer);
+        for (const [r, c] of legal) {
+          const x = c * CELL_SIZE, y = r * CELL_SIZE;
+          ctx.strokeStyle = HIGHLIGHT_COLOR;
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 3]);
+          ctx.strokeRect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+          ctx.setLineDash([]);
+        }
+      }
+
+      // AI preview
+      if (aiHighlight) {
+        const [r, c] = aiHighlight;
+        const x = c * CELL_SIZE, y = r * CELL_SIZE;
+        ctx.strokeStyle = AI_PREVIEW_COLOR;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+      }
+    }
+
+    function setStatus(text) {
+      statusDiv.textContent = text;
+    }
+
+    function advanceToNextActive() {
+      const active = board.activePlayers();
+      if (active.length === 0) {
+        endGame(-1);
+        return false;
+      }
+      for (let i = 0; i < players.length; i++) {
+        currentPlayer = (currentPlayer + 1) % players.length;
+        if (active.includes(currentPlayer)) break;
+      }
+      return true;
+    }
+
+    function endGame(winner) {
+      if (gameOver) return;
+      gameOver = true;
+      drawBoard();
+      let msg = winner === -1 ? 'Draw! All pieces vanished.' : `Player ${winner+1} wins!`;
+      setStatus(msg);
+      setTimeout(() => alert(msg), 50);
+    }
+
+    function runTurn() {
+      if (gameOver || animating) return;
+      const active = board.activePlayers();
+      if (!active.includes(currentPlayer)) {
+        if (!advanceToNextActive()) return;
+        runTurn();
+        return;
+      }
+      drawBoard();
+      const p = players[currentPlayer];
+      if (p.type === 'human') {
+        setStatus(`Player ${currentPlayer+1}'s turn (Human) — select a cell`);
+      } else {
+        setStatus(`Player ${currentPlayer+1}'s turn (AI) — thinking…`);
+        setTimeout(() => aiTurn(), 300);
+      }
+    }
+
+    function aiTurn() {
+      if (gameOver || animating) return;
+      const move = aiMove(board, currentPlayer, players[currentPlayer].difficulty);
+      if (!move) {
+        if (!advanceToNextActive()) return;
+        runTurn();
+        return;
+      }
+      const [r, c] = move;
+      aiHighlight = [r, c];
+      setStatus(`Player ${currentPlayer+1}'s turn (AI) — places at (${r},${c})`);
+      drawBoard();
+      soundMove();
+      setTimeout(() => {
+        aiHighlight = null;
+        executeMove(r, c);
+      }, 400);
+    }
+
+    function executeMove(r, c) {
+      if (animating) return;
+      const player = currentPlayer;
+      const states = board.addPiece(player, r, c);
+      if (states.length === 0) return;
+      board = states[states.length - 1];
+      animating = true;
+      animateChain(states, 0);
+    }
+
+    function animateChain(states, index) {
+      if (index < states.length) {
+        board = states[index];
+        drawBoard();
+        if (index > 0) soundExplosion();
+        animationTimer = setTimeout(() => animateChain(states, index + 1), ANIMATION_DELAY);
+      } else {
+        animating = false;
+        drawBoard();
+        const w = board.winner();
+        if (w !== null) {
+          endGame(w);
+          return;
+        }
+        if (!advanceToNextActive()) return;
+        runTurn();
+      }
+    }
+
+    function handleCanvasClick(e) {
+      if (gameOver || animating) return;
+      if (players[currentPlayer].type !== 'human') return;
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const mouseX = (e.clientX - rect.left) * scaleX;
+      const mouseY = (e.clientY - rect.top) * scaleY;
+      const c = Math.floor(mouseX / CELL_SIZE);
+      const r = Math.floor(mouseY / CELL_SIZE);
+      if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
+        const legal = board.legalMoves(currentPlayer);
+        if (legal.some(([rr, cc]) => rr === r && cc === c)) {
+          soundMove();
+          executeMove(r, c);
+        }
+      }
+    }
+
+    function newGame() {
+      if (animating) {
+        clearTimeout(animationTimer);
+        animating = false;
+      }
+      const num = parseInt(numPlayersSelect.value);
+      players = collectPlayers();
+      board = new Board(num);
+      currentPlayer = 0;
+      gameOver = false;
+      aiHighlight = null;
+      setStatus('New game started');
+      drawBoard();
+      runTurn();
+    }
+
+    numPlayersSelect.addEventListener('change', renderPlayersSetup);
+    newGameBtn.addEventListener('click', newGame);
+    canvas.addEventListener('click', handleCanvasClick);
+
+    renderPlayersSetup();
+    window.addEventListener('load', () => {
+      setTimeout(newGame, 100);
+    });
+  })();
+</script>
+</body>
+</html>
