@@ -288,7 +288,7 @@
     </div>
   </div>
 
-  <div id="status" class="status">Configure the game and press New Game</div>
+  <div id="status" class="status">Welcome to «Chain Hegemony»!</div>
 
   <div class="how-to-play">
     <h3>How to play?</h3>
@@ -632,7 +632,7 @@
         const card = document.createElement('div');
         card.className = 'player-card';
         card.innerHTML = `
-          <div class="name">Player ${i+1}</div>
+          <div class="name">Player ${i+1} <span style="color:${COLORS[i]}; font-size:14px;">●</span></div>
           <div class="options">
             <label><input type="radio" name="player${i}" value="human" ${i === 0 ? 'checked' : ''}> Human</label>
             <label><input type="radio" name="player${i}" value="ai" ${i > 0 ? 'checked' : ''}> AI</label>
@@ -663,7 +663,16 @@
 
     function drawBoard() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (!board) return;
+      if (!board) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ccc';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('Configure the game & press "New Game" to start', canvas.width/2, canvas.height/2);
+        return;
+      }
 
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
@@ -849,9 +858,7 @@
     speed = parseInt(speedSlider.value);
     speedValue.textContent = speed;
     soundEnabled = soundCheckbox.checked;
-    window.addEventListener('load', () => {
-      setTimeout(newGame, 100);
-    });
+    drawBoard(); // shows shaded overlay until game starts
   })();
 </script>
 </body>
