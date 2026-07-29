@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAABlSURBVFhHYzQyMvrPMICACURsleICYxgglc+UthKMYYAUPtgBAwkGRxQMJBhNA6NpYDQNjKaB0TQwmgbADvgzyx6MYYBU/v5Jd8EYBkjhj6aB0TQwmgZG08BoGhhNAyM9DTAwAABgVcwVAjRCngAAAABJRU5ErkJggg==">
-  <title>Chain Hegemony</title>
+  <title>Chain Hegemony 2</title>
   <style>
     * {
       box-sizing: border-box;
@@ -12,7 +12,8 @@
       padding: 0;
     }
     body {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: #0a0a14;
+      background: radial-gradient(circle at center, #1a1a2e 0%, #05050a 100%);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -20,27 +21,32 @@
       min-height: 100vh;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 20px;
+      color: #fff;
     }
     .game-container {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
+      background: rgba(20, 20, 35, 0.6);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 24px;
       padding: 24px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.05);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 20px;
     }
     canvas {
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      background: #0d0d16;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.9), inset 0 0 15px rgba(255,255,255,0.02);
       display: block;
+      cursor: crosshair;
     }
     .controls {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
+      width: 100%;
     }
     .top-controls {
       display: flex;
@@ -52,211 +58,199 @@
     .player-count {
       display: flex;
       align-items: center;
-      gap: 8px;
-      color: #eee;
-      font-size: 14px;
+      gap: 10px;
+      color: #aaa;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
     .player-count select {
       padding: 6px 12px;
       border-radius: 8px;
-      border: none;
-      background: #2a2a4a;
-      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: #1e1e30;
+      color: #00ffcc;
       font-size: 14px;
+      font-weight: bold;
       outline: none;
+      cursor: pointer;
     }
     .players-setup {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 12px;
+      width: 100%;
     }
     .player-card {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 12px;
-      padding: 8px 12px;
+      padding: 12px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
       color: #ddd;
       font-size: 13px;
+      transition: all 0.3s;
+    }
+    .player-card:hover {
+      background: rgba(255, 255, 255, 0.05);
     }
     .player-card .name {
       font-weight: bold;
-      margin-bottom: 2px;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
     .player-card .options {
       display: flex;
-      gap: 6px;
+      gap: 10px;
     }
     .player-card label {
       display: flex;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
       cursor: pointer;
     }
     .player-card select {
       padding: 4px 8px;
       border-radius: 6px;
-      border: none;
-      background: #3a3a5a;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: #2a2a4a;
       color: white;
       font-size: 12px;
       outline: none;
-      margin-left: 4px;
     }
     .btn {
-      background: #e94560;
+      background: linear-gradient(45deg, #ff0055, #ff0099);
       color: white;
       border: none;
-      padding: 10px 24px;
+      padding: 10px 28px;
       border-radius: 30px;
       font-size: 16px;
       font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       cursor: pointer;
-      transition: background 0.3s, transform 0.1s;
-      letter-spacing: 0.5px;
-      box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
     }
     .btn:hover {
-      background: #c23152;
+      box-shadow: 0 0 25px rgba(255, 0, 85, 0.7);
+      transform: translateY(-2px);
     }
     .btn:active {
-      transform: scale(0.96);
+      transform: translateY(1px) scale(0.98);
     }
     .status {
       font-size: 16px;
-      font-weight: 500;
-      color: #f0f0f0;
-      background: rgba(0,0,0,0.3);
-      padding: 8px 20px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: #fff;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 24px;
       border-radius: 20px;
       text-align: center;
       min-width: 300px;
+      box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
     }
     .extra-controls {
       display: flex;
       align-items: center;
       gap: 20px;
-      color: #ccc;
+      color: #aaa;
       font-size: 14px;
-      margin: 8px 0;
     }
     .extra-controls label {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       cursor: pointer;
     }
     .extra-controls input[type="range"] {
       width: 100px;
-      accent-color: #e94560;
+      accent-color: #00ffcc;
     }
     .extra-controls input[type="checkbox"] {
-      accent-color: #e94560;
+      accent-color: #00ffcc;
       width: 16px;
       height: 16px;
     }
-    .how-to-play {
-      background: rgba(0,0,0,0.3);
-      border-radius: 12px;
-      padding: 16px 20px;
-      color: #ccc;
-      font-size: 14px;
-      max-width: 500px;
-      width: 100%;
-      margin: 0 auto;
-    }
-    .how-to-play h3 {
-      margin-bottom: 12px;
-      color: #fff;
-      text-align: center;
-    }
-    .chain-demo {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .chain-cell {
-      width: 40px;
-      height: 40px;
-      border: 2px solid #aaa;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 18px;
-      color: white;
-      background: #555;
-    }
-    .arrow {
-      font-size: 20px;
-      color: #e94560;
-      margin: 0 2px;
-    }
-    .explosion-demo {
-      display: flex;
-      justify-content: center;
-      margin: 8px 0;
-    }
-    .mini-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 36px);
-      grid-template-rows: repeat(3, 36px);
-      gap: 2px;
-      background: #222;
-      padding: 4px;
-      border-radius: 4px;
-    }
-    .mini-cell {
-      background: #444;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: bold;
-      color: white;
-    }
-    .mini-cell.center {
-      background: #555;
+    .toggle-switch {
       position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
     }
-    .mini-cell.center::after {
-      content: "✕";
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
       position: absolute;
-      color: rgba(255,255,255,0.7);
-      font-size: 16px;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #444;
+      transition: .3s;
+      border-radius: 24px;
     }
-    .mini-cell.neighbor {
-      background: #e94560;
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
     }
-    .explanation {
-      margin-top: 8px;
-      font-size: 13px;
-      line-height: 1.5;
+    input:checked + .slider {
+      background-color: #00ffcc;
+      box-shadow: 0 0 8px #00ffcc;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    .title-section {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 16px 24px;
+      color: #999;
+      font-size: 14px;
+      max-width: 550px;
+      width: 100%;
       text-align: center;
+      line-height: 1.6;
+    }
+    .title-section .main-title {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: #fff;
+      text-shadow: 0 0 15px rgba(255,0,85,0.7), 0 0 30px rgba(255,0,85,0.4);
+      margin-bottom: 4px;
+    }
+    .title-section .sub-title {
+      font-size: 14px;
+      letter-spacing: 2px;
+      color: #00ffcc;
+      text-shadow: 0 0 10px rgba(0,255,204,0.5);
     }
     .copyright {
-      margin-top: 12px;
       width: 100%;
-      text-align: right;
-      color: rgba(255,255,255,0.4);
+      text-align: center;
+      color: #555;
       font-size: 12px;
-      padding-right: 8px;
-    }
-    @media (max-width: 700px) {
-      .top-controls {
-        flex-direction: column;
-        align-items: center;
-      }
-      canvas {
-        width: 100%;
-        height: auto;
-      }
+      letter-spacing: 1px;
     }
   </style>
 </head>
@@ -266,111 +260,67 @@
 
   <div class="controls">
     <div class="top-controls">
+      <label style="display: flex; align-items: center; gap: 6px; color: #aaa; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">
+        <span style="font-size: 12px;">Own</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="modeToggle">
+          <span class="slider"></span>
+        </label>
+        <span style="font-size: 12px;">Any</span>
+      </label>
       <div class="player-count">
-        <span>Players:</span>
+        <span>Players</span>
         <select id="numPlayers">
           <option value="2">2</option>
           <option value="3">3</option>
           <option value="4" selected>4</option>
         </select>
       </div>
-      <button class="btn" id="newGameBtn">New Game</button>
+      <button class="btn" id="newGameBtn">Start Protocol</button>
     </div>
     <div id="playersSetup" class="players-setup"></div>
     <div class="extra-controls">
       <label>
-        Speed: <input type="range" id="speedSlider" min="1" max="10" value="10">
-        <span id="speedValue">10</span>
+        Speed <input type="range" id="speedSlider" min="1" max="30" value="15">
+        <span id="speedValue" style="color: #00ffcc; font-weight: bold;">15</span>
       </label>
       <label>
-        Sound: <input type="checkbox" id="soundCheckbox" checked>
+        SFX <input type="checkbox" id="soundCheckbox" checked>
       </label>
     </div>
   </div>
 
-  <div id="status" class="status">Welcome to «Chain Hegemony»!</div>
+  <div id="status" class="status">SYSTEM IDLE: CONFIGURE MATCH</div>
 
-  <div class="how-to-play">
-    <h3>How to play?</h3>
-    <div class="chain-demo">
-      <div class="chain-cell">1</div>
-      <span class="arrow">→</span>
-      <div class="chain-cell">2</div>
-      <span class="arrow">→</span>
-      <div class="chain-cell">3</div>
-      <span class="arrow">→</span>
-      <div class="chain-cell" style="background:#e94560;">4</div>
-      <span class="arrow">→</span>
-      <span style="font-size:24px; color:#e94560;">💥</span>
-    </div>
-    <div class="explosion-demo">
-      <div class="mini-grid">
-        <div class="mini-cell"></div>
-        <div class="mini-cell neighbor">1</div>
-        <div class="mini-cell"></div>
-        <div class="mini-cell neighbor">1</div>
-        <div class="mini-cell center">0</div>
-        <div class="mini-cell neighbor">1</div>
-        <div class="mini-cell"></div>
-        <div class="mini-cell neighbor">1</div>
-        <div class="mini-cell"></div>
-      </div>
-    </div>
-    <div class="explanation">
-      <strong>Place one piece</strong> on any cell you own.<br>
-      When a cell reaches <strong>4 pieces</strong>, it <strong>explodes</strong>: all pieces scatter to orthogonal neighbours (one each) and the cell empties.<br>
-      Captured cells change to your colour. Chain reactions may occur!
-    </div>
+  <div class="title-section">
+    <div class="main-title">Chain Hegemony 2</div>
+    <div class="sub-title">Optical Edition</div>
   </div>
 
-  <div class="copyright">© ODVk</div>
+  <div class="copyright"><a href="https://github.com/Otkupman/Chain-Hegemony">© ODVk</a></div>
 </div>
 
 <script>
   (function() {
     const ROWS = 8, COLS = 8;
     const CELL_SIZE = 64;
-    const COLORS = ["#E74C3C", "#3498DB", "#2ECC71", "#F1C40F"];
-    const EMPTY_COLOR = "#BDC3C7";
-    const HIGHLIGHT_COLOR = "#2C3E50";
-    const AI_PREVIEW_COLOR = "#F39C12";
-    const TURN_BORDER_WIDTH = 5;
-
-    let speed = 10;
+    const COLORS = ["#ff2a2a", "#00d4ff", "#00ff66", "#ffcc00"];
+    
+    let speed = 15;
     let soundEnabled = true;
+    let placementMode = 'own';
 
     function getExplosionDelay() { return Math.round(500 / speed); }
     function getAiThinkDelay() { return Math.round(250 / speed); }
     function getAiHighlightDelay() { return Math.round(400 / speed); }
 
-    function darkenColor(hex, factor) {
-      hex = hex.replace('#', '');
-      const r = parseInt(hex.substring(0,2), 16);
-      const g = parseInt(hex.substring(2,4), 16);
-      const b = parseInt(hex.substring(4,6), 16);
-      const nr = Math.round(r * factor);
-      const ng = Math.round(g * factor);
-      const nb = Math.round(b * factor);
-      return `#${nr.toString(16).padStart(2,'0')}${ng.toString(16).padStart(2,'0')}${nb.toString(16).padStart(2,'0')}`;
-    }
-
-    function cellColor(owner, count) {
-      if (owner === null) return EMPTY_COLOR;
-      const base = COLORS[owner];
-      let factor = 1;
-      if (count === 2) factor = 0.8;
-      else if (count === 3) factor = 0.6;
-      else if (count >= 4) factor = 0.4;
-      return darkenColor(base, factor);
-    }
-
-    function playBeep(freq, duration) {
+    function playBeep(freq, duration, type = 'sine') {
       if (!soundEnabled) return;
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
-        oscillator.type = 'sine';
+        oscillator.type = type;
         oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
         gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration / 1000);
@@ -381,8 +331,9 @@
       } catch (e) { }
     }
 
-    function soundMove() { playBeep(800, 80); }
-    function soundExplosion() { playBeep(250, 150); }
+    function soundMove() { playBeep(800, 80, 'sine'); }
+    function soundExplosion() { playBeep(150, 200, 'square'); }
+    function soundWin() { playBeep(1200, 400, 'triangle'); }
 
     class Board {
       constructor(numPlayers) {
@@ -410,20 +361,21 @@
         const b = new Board(this.numPlayers);
         for (let r = 0; r < ROWS; r++) {
           for (let c = 0; c < COLS; c++) {
-            b.grid[r][c] = {
-              count: this.grid[r][c].count,
-              owner: this.grid[r][c].owner
-            };
+            b.grid[r][c] = { count: this.grid[r][c].count, owner: this.grid[r][c].owner };
           }
         }
         return b;
       }
 
-      legalMoves(player) {
+      legalMoves(player, mode) {
         const moves = [];
         for (let r = 0; r < ROWS; r++) {
           for (let c = 0; c < COLS; c++) {
-            if (this.grid[r][c].owner === player) moves.push([r, c]);
+            if (mode === 'anywhere') {
+              if (this.grid[r][c].owner === player || this.grid[r][c].owner === null) moves.push([r, c]);
+            } else {
+              if (this.grid[r][c].owner === player) moves.push([r, c]);
+            }
           }
         }
         return moves;
@@ -447,11 +399,17 @@
         return null;
       }
 
-      addPiece(player, r, c) {
-        if (this.grid[r][c].owner !== player) return [];
+      addPiece(player, r, c, mode) {
+        if (mode === 'anywhere') {
+          if (this.grid[r][c].owner !== player && this.grid[r][c].owner !== null) return [];
+        } else {
+          if (this.grid[r][c].owner !== player) return [];
+        }
+        
         this.grid[r][c].count++;
         this.grid[r][c].owner = player;
         const states = [];
+        
         while (true) {
           let toExplode = null;
           for (let i = 0; i < ROWS; i++) {
@@ -464,10 +422,12 @@
             if (toExplode) break;
           }
           if (!toExplode) break;
+          
           const [r0, c0] = toExplode;
           const p = this.grid[r0][c0].owner;
-          this.grid[r0][c0].count = 0;
-          this.grid[r0][c0].owner = null;
+          this.grid[r0][c0].count -= 4;
+          if (this.grid[r0][c0].count === 0) this.grid[r0][c0].owner = null;
+          
           const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
           for (const [dr, dc] of dirs) {
             const nr = r0 + dr, nc = c0 + dc;
@@ -502,73 +462,53 @@
     }
 
     function aiMove(board, player, difficulty) {
-      const legal = board.legalMoves(player);
+      const mode = placementMode;
+      const legal = board.legalMoves(player, mode);
       if (legal.length === 0) return null;
-      if (difficulty === 'easy') {
-        return legal[Math.floor(Math.random() * legal.length)];
-      }
+      if (difficulty === 'easy') return legal[Math.floor(Math.random() * legal.length)];
+      
       const active = board.activePlayers();
       if (difficulty === 'medium') {
-        let bestScore = -Infinity;
-        let bestMoves = [];
+        let bestScore = -Infinity, bestMoves = [];
         for (const move of legal) {
           const sim = board.clone();
-          sim.addPiece(player, move[0], move[1]);
+          sim.addPiece(player, move[0], move[1], mode);
           const w = sim.winner();
-          let score;
-          if (w === player) score = 10000;
-          else if (w !== null && w !== -1) score = -10000;
-          else if (w === -1) score = -5000;
-          else score = evaluate(sim, player, active);
-          if (score > bestScore) {
-            bestScore = score;
-            bestMoves = [move];
-          } else if (score === bestScore) {
-            bestMoves.push(move);
-          }
+          let score = (w === player) ? 10000 : (w !== null && w !== -1) ? -10000 : (w === -1) ? -5000 : evaluate(sim, player, active);
+          if (score > bestScore) { bestScore = score; bestMoves = [move]; } 
+          else if (score === bestScore) { bestMoves.push(move); }
         }
         return bestMoves[Math.floor(Math.random() * bestMoves.length)];
       }
+      
       if (difficulty === 'hard') {
         const opponents = active.filter(p => p !== player);
-        let targetOpponent = null;
-        let maxOppCount = -1;
+        let targetOpponent = null, maxOppCount = -1;
         for (const opp of opponents) {
           let cnt = 0;
-          for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-              if (board.grid[r][c].owner === opp) cnt += board.grid[r][c].count;
-            }
-          }
-          if (cnt > maxOppCount) {
-            maxOppCount = cnt;
-            targetOpponent = opp;
-          }
+          for (let r=0; r<ROWS; r++) for (let c=0; c<COLS; c++) if (board.grid[r][c].owner === opp) cnt += board.grid[r][c].count;
+          if (cnt > maxOppCount) { maxOppCount = cnt; targetOpponent = opp; }
         }
         if (targetOpponent === null) return legal[0];
-        let bestScore = -Infinity;
-        let bestMoves = [];
+        
+        let bestScore = -Infinity, bestMoves = [];
         for (const move of legal) {
           const simAfterMyMove = board.clone();
-          simAfterMyMove.addPiece(player, move[0], move[1]);
-          const oppLegal = simAfterMyMove.legalMoves(targetOpponent);
+          simAfterMyMove.addPiece(player, move[0], move[1], mode);
+          const oppLegal = simAfterMyMove.legalMoves(targetOpponent, mode);
           let minScore = Infinity;
           if (oppLegal.length === 0) {
             minScore = evaluate(simAfterMyMove, player, active);
           } else {
             for (const oppMove of oppLegal) {
               const simAfterOpp = simAfterMyMove.clone();
-              simAfterOpp.addPiece(targetOpponent, oppMove[0], oppMove[1]);
+              simAfterOpp.addPiece(targetOpponent, oppMove[0], oppMove[1], mode);
               const score = evaluate(simAfterOpp, player, active);
               if (score < minScore) minScore = score;
             }
           }
-          if (minScore > bestScore) {
-            bestScore = minScore;
-            bestMoves = [move];
-          } else if (minScore === bestScore) {
-            bestMoves.push(move);
-          }
+          if (minScore > bestScore) { bestScore = minScore; bestMoves = [move]; } 
+          else if (minScore === bestScore) { bestMoves.push(move); }
         }
         return bestMoves[Math.floor(Math.random() * bestMoves.length)];
       }
@@ -584,6 +524,7 @@
     const speedSlider = document.getElementById('speedSlider');
     const speedValue = document.getElementById('speedValue');
     const soundCheckbox = document.getElementById('soundCheckbox');
+    const modeToggle = document.getElementById('modeToggle');
 
     let board = null;
     let players = [];
@@ -592,47 +533,29 @@
     let animating = false;
     let aiHighlight = null;
     let animationTimer = null;
+    let globalTime = 0;
+    
+    requestAnimationFrame(renderLoop);
 
     speedSlider.addEventListener('input', () => {
       speed = parseInt(speedSlider.value);
       speedValue.textContent = speed;
     });
-    soundCheckbox.addEventListener('change', () => {
-      soundEnabled = soundCheckbox.checked;
+    soundCheckbox.addEventListener('change', () => { soundEnabled = soundCheckbox.checked; });
+    modeToggle.addEventListener('change', () => {
+      placementMode = modeToggle.checked ? 'anywhere' : 'own';
     });
-
-    function getDefaultPlayers(num) {
-      const arr = [];
-      for (let i = 0; i < num; i++) {
-        arr.push({ type: i === 0 ? 'human' : 'ai', difficulty: 'easy' });
-      }
-      return arr;
-    }
-
-    function attachPlayerEvents() {
-      const num = parseInt(numPlayersSelect.value);
-      for (let i = 0; i < num; i++) {
-        const humanRadio = document.querySelector(`input[name="player${i}"][value="human"]`);
-        const aiRadio = document.querySelector(`input[name="player${i}"][value="ai"]`);
-        const diffSelect = document.getElementById(`diff${i}`);
-        if (!humanRadio || !aiRadio || !diffSelect) continue;
-        const updateVisibility = () => {
-          diffSelect.style.display = humanRadio.checked ? 'none' : 'inline-block';
-        };
-        humanRadio.addEventListener('change', updateVisibility);
-        aiRadio.addEventListener('change', updateVisibility);
-        updateVisibility();
-      }
-    }
 
     function renderPlayersSetup() {
       const num = parseInt(numPlayersSelect.value);
       playersSetupDiv.innerHTML = '';
+      
       for (let i = 0; i < num; i++) {
         const card = document.createElement('div');
         card.className = 'player-card';
+        card.style.borderTop = `3px solid ${COLORS[i]}`;
         card.innerHTML = `
-          <div class="name">Player ${i+1} <span style="color:${COLORS[i]}; font-size:14px;">●</span></div>
+          <div class="name" style="color:${COLORS[i]}; text-shadow: 0 0 8px ${COLORS[i]}">Player ${i+1}</div>
           <div class="options">
             <label><input type="radio" name="player${i}" value="human" ${i === 0 ? 'checked' : ''}> Human</label>
             <label><input type="radio" name="player${i}" value="ai" ${i > 0 ? 'checked' : ''}> AI</label>
@@ -645,7 +568,16 @@
         `;
         playersSetupDiv.appendChild(card);
       }
-      attachPlayerEvents();
+      
+      for (let i = 0; i < num; i++) {
+        const humanRadio = document.querySelector(`input[name="player${i}"][value="human"]`);
+        const aiRadio = document.querySelector(`input[name="player${i}"][value="ai"]`);
+        const diffSelect = document.getElementById(`diff${i}`);
+        const updateVisibility = () => diffSelect.style.display = humanRadio.checked ? 'none' : 'inline-block';
+        humanRadio.addEventListener('change', updateVisibility);
+        aiRadio.addEventListener('change', updateVisibility);
+        updateVisibility();
+      }
     }
 
     function collectPlayers() {
@@ -661,70 +593,99 @@
       return arr;
     }
 
-    function drawBoard() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function renderLoop() {
+      globalTime += 0.05;
+      
+      ctx.fillStyle = '#0a0a10';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
       if (!board) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#ccc';
-        ctx.font = 'bold 20px Arial';
+        ctx.fillStyle = '#444';
+        ctx.font = '16px monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('Configure the game & press "New Game" to start', canvas.width/2, canvas.height/2);
+        ctx.fillText('WAITING FOR PROTOCOL INITIATION...', canvas.width/2, canvas.height/2);
+        requestAnimationFrame(renderLoop);
         return;
+      }
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= ROWS; i++) {
+        ctx.beginPath(); ctx.moveTo(0, i * CELL_SIZE); ctx.lineTo(canvas.width, i * CELL_SIZE); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(i * CELL_SIZE, 0); ctx.lineTo(i * CELL_SIZE, canvas.height); ctx.stroke();
       }
 
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
-          const x = c * CELL_SIZE, y = r * CELL_SIZE;
           const cell = board.grid[r][c];
-          const color = cellColor(cell.owner, cell.count);
-          ctx.fillStyle = color;
-          ctx.fillRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
-          ctx.strokeStyle = '#000';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+          if (cell.count === 0) continue;
 
-          if (cell.count > 0) {
+          const cx = c * CELL_SIZE + CELL_SIZE / 2;
+          const cy = r * CELL_SIZE + CELL_SIZE / 2;
+          const color = COLORS[cell.owner];
+          
+          const isCritical = cell.count === 3;
+          const pulse = isCritical ? Math.sin(globalTime * 2) * 3 : 0;
+          const baseRadius = 6;
+          
+          ctx.shadowBlur = 15 + (isCritical ? pulse * 2 : 0);
+          ctx.shadowColor = color;
+          ctx.fillStyle = color;
+
+          const drawOrb = (ox, oy) => {
+            ctx.beginPath();
+            ctx.arc(ox, oy, baseRadius + (isCritical ? pulse * 0.5 : 0), 0, Math.PI * 2);
+            ctx.fill();
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 18px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(cell.count, x + CELL_SIZE/2, y + CELL_SIZE/2);
+            ctx.shadowBlur = 0;
+            ctx.beginPath();
+            ctx.arc(ox, oy, baseRadius * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = color;
+            ctx.shadowBlur = 15 + (isCritical ? pulse * 2 : 0);
+          };
+
+          if (cell.count === 1) {
+            drawOrb(cx, cy);
+          } else if (cell.count === 2) {
+            drawOrb(cx - 10, cy);
+            drawOrb(cx + 10, cy);
+          } else if (cell.count === 3) {
+            drawOrb(cx, cy - 10);
+            drawOrb(cx - 10, cy + 8);
+            drawOrb(cx + 10, cy + 8);
           }
+          ctx.shadowBlur = 0;
         }
       }
 
       if (!gameOver && currentPlayer !== null && board.activePlayers().includes(currentPlayer)) {
         ctx.strokeStyle = COLORS[currentPlayer];
-        ctx.lineWidth = TURN_BORDER_WIDTH;
-        ctx.strokeRect(TURN_BORDER_WIDTH/2, TURN_BORDER_WIDTH/2,
-                       canvas.width - TURN_BORDER_WIDTH, canvas.height - TURN_BORDER_WIDTH);
-      }
-
-      if (!gameOver && !animating && players[currentPlayer] && players[currentPlayer].type === 'human') {
-        const legal = board.legalMoves(currentPlayer);
-        for (const [r, c] of legal) {
-          const x = c * CELL_SIZE, y = r * CELL_SIZE;
-          ctx.strokeStyle = HIGHLIGHT_COLOR;
-          ctx.lineWidth = 2;
-          ctx.setLineDash([5, 3]);
-          ctx.strokeRect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4);
-          ctx.setLineDash([]);
-        }
+        ctx.shadowColor = COLORS[currentPlayer];
+        ctx.shadowBlur = 20;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(1, 1, canvas.width - 2, canvas.height - 2);
+        ctx.shadowBlur = 0;
       }
 
       if (aiHighlight) {
         const [r, c] = aiHighlight;
-        const x = c * CELL_SIZE, y = r * CELL_SIZE;
-        ctx.strokeStyle = AI_PREVIEW_COLOR;
-        ctx.lineWidth = 3;
-        ctx.strokeRect(x + 2, y + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+        ctx.strokeStyle = COLORS[currentPlayer];
+        ctx.shadowColor = COLORS[currentPlayer];
+        ctx.shadowBlur = 10;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(c * CELL_SIZE + 2, r * CELL_SIZE + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+        ctx.shadowBlur = 0;
       }
+
+      requestAnimationFrame(renderLoop);
     }
 
-    function setStatus(text) {
-      statusDiv.textContent = text;
+    function setStatus(text, color = '#fff') {
+      statusDiv.innerHTML = text;
+      statusDiv.style.color = color;
+      statusDiv.style.textShadow = `0 0 10px ${color}`;
     }
 
     function advanceToNextActive() {
@@ -743,10 +704,12 @@
     function endGame(winner) {
       if (gameOver) return;
       gameOver = true;
-      drawBoard();
-      let msg = winner === -1 ? 'Draw! All pieces vanished.' : `Player ${winner+1} wins!`;
-      setStatus(msg);
-      setTimeout(() => alert(msg), 50);
+      if (winner === -1) {
+        setStatus('ANOMALY: ALL ENERGY DISSIPATED (DRAW)', '#ff00ff');
+      } else {
+        soundWin();
+        setStatus(`VICTORY: PLAYER ${winner+1} DOMINATES`, COLORS[winner]);
+      }
     }
 
     function runTurn() {
@@ -757,12 +720,11 @@
         runTurn();
         return;
       }
-      drawBoard();
       const p = players[currentPlayer];
       if (p.type === 'human') {
-        setStatus(`Player ${currentPlayer+1}'s turn (Human) — select a cell`);
+        setStatus(`PLAYER ${currentPlayer+1} <span style="font-size:12px;color:#aaa;">[HUMAN]</span> : AWAITING INPUT`, COLORS[currentPlayer]);
       } else {
-        setStatus(`Player ${currentPlayer+1}'s turn (AI) — thinking…`);
+        setStatus(`PLAYER ${currentPlayer+1} <span style="font-size:12px;color:#aaa;">[AI COMPUTING...]</span>`, COLORS[currentPlayer]);
         setTimeout(() => aiTurn(), getAiThinkDelay());
       }
     }
@@ -777,8 +739,6 @@
       }
       const [r, c] = move;
       aiHighlight = [r, c];
-      setStatus(`Player ${currentPlayer+1}'s turn (AI) — places at (${r},${c})`);
-      drawBoard();
       soundMove();
       setTimeout(() => {
         aiHighlight = null;
@@ -788,8 +748,8 @@
 
     function executeMove(r, c) {
       if (animating) return;
-      const player = currentPlayer;
-      const states = board.addPiece(player, r, c);
+      const mode = placementMode;
+      const states = board.addPiece(currentPlayer, r, c, mode);
       if (states.length === 0) return;
       board = states[states.length - 1];
       animating = true;
@@ -799,34 +759,26 @@
     function animateChain(states, index) {
       if (index < states.length) {
         board = states[index];
-        drawBoard();
         if (index > 0) soundExplosion();
         animationTimer = setTimeout(() => animateChain(states, index + 1), getExplosionDelay());
       } else {
         animating = false;
-        drawBoard();
         const w = board.winner();
-        if (w !== null) {
-          endGame(w);
-          return;
-        }
+        if (w !== null) { endGame(w); return; }
         if (!advanceToNextActive()) return;
         runTurn();
       }
     }
 
     function handleCanvasClick(e) {
-      if (gameOver || animating) return;
-      if (players[currentPlayer].type !== 'human') return;
+      if (gameOver || animating || players[currentPlayer].type !== 'human') return;
       const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const mouseX = (e.clientX - rect.left) * scaleX;
-      const mouseY = (e.clientY - rect.top) * scaleY;
-      const c = Math.floor(mouseX / CELL_SIZE);
-      const r = Math.floor(mouseY / CELL_SIZE);
+      const c = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width) / CELL_SIZE);
+      const r = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height) / CELL_SIZE);
+      
       if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
-        const legal = board.legalMoves(currentPlayer);
+        const mode = placementMode;
+        const legal = board.legalMoves(currentPlayer, mode);
         if (legal.some(([rr, cc]) => rr === r && cc === c)) {
           soundMove();
           executeMove(r, c);
@@ -835,30 +787,22 @@
     }
 
     function newGame() {
-      if (animating) {
-        clearTimeout(animationTimer);
-        animating = false;
-      }
-      const num = parseInt(numPlayersSelect.value);
+      if (animating) { clearTimeout(animationTimer); animating = false; }
       players = collectPlayers();
-      board = new Board(num);
+      board = new Board(parseInt(numPlayersSelect.value));
       currentPlayer = 0;
       gameOver = false;
       aiHighlight = null;
-      setStatus('New game started');
-      drawBoard();
+      globalTime = 0;
       runTurn();
     }
 
     numPlayersSelect.addEventListener('change', renderPlayersSetup);
     newGameBtn.addEventListener('click', newGame);
     canvas.addEventListener('click', handleCanvasClick);
-
     renderPlayersSetup();
-    speed = parseInt(speedSlider.value);
-    speedValue.textContent = speed;
-    soundEnabled = soundCheckbox.checked;
-    drawBoard(); // shows shaded overlay until game starts
+    modeToggle.checked = false;
+    
   })();
 </script>
 </body>
